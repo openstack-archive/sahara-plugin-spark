@@ -19,27 +19,22 @@ import os
 from oslo_config import cfg
 from oslo_log import log as logging
 
-from sahara import conductor
-from sahara import context
-from sahara.i18n import _
+from sahara.plugins import conductor
+from sahara.plugins import context
 from sahara.plugins import exceptions as ex
 from sahara.plugins import provisioning as p
 from sahara.plugins import recommendations_utils as ru
-from sahara.plugins.spark import config_helper as c_helper
-from sahara.plugins.spark import edp_engine
-from sahara.plugins.spark import run_scripts as run
-from sahara.plugins.spark import scaling as sc
-from sahara.plugins.spark import shell_engine
+from sahara.plugins import swift_helper
+from sahara.plugins import topology_helper as th
 from sahara.plugins import utils
-from sahara.swift import swift_helper
-from sahara.topology import topology_helper as th
-from sahara.utils import cluster_progress_ops as cpo
-from sahara.utils import files as f
-from sahara.utils import general as ug
-from sahara.utils import remote
+from sahara_plugin_spark.i18n import _
+from sahara_plugin_spark.plugins.spark import config_helper as c_helper
+from sahara_plugin_spark.plugins.spark import edp_engine
+from sahara_plugin_spark.plugins.spark import run_scripts as run
+from sahara_plugin_spark.plugins.spark import scaling as sc
+from sahara_plugin_spark.plugins.spark import shell_engine
 
 
-conductor = conductor.API
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
@@ -127,10 +122,10 @@ class SparkProvider(p.ProvisioningPluginBase):
     def configure_cluster(self, cluster):
         self._setup_instances(cluster)
 
-    @cpo.event_wrapper(
+    @utils.event_wrapper(
         True, step=utils.start_process_event_message("NameNode"))
     def _start_namenode(self, nn_instance):
-        with remote.get_remote(nn_instance) as r:
+        with utils.get_remote(nn_instance) as r:
             run.format_namenode(r)
             run.start_processes(r, "namenode")
 
@@ -139,10 +134,10 @@ class SparkProvider(p.ProvisioningPluginBase):
         if sm_instance:
             self._start_spark(cluster, sm_instance)
 
-    @cpo.event_wrapper(
+    @utils.event_wrapper(
         True, step=utils.start_process_event_message("SparkMasterNode"))
     def _start_spark(self, cluster, sm_instance):
-        with remote.get_remote(sm_instance) as r:
+        with utils.get_remote(sm_instance) as r:
             run.start_spark_master(r, self._spark_home(cluster))
             LOG.info("Spark service has been started")
 
@@ -159,7 +154,7 @@ class SparkProvider(p.ProvisioningPluginBase):
 
         LOG.info("Hadoop services have been started")
 
-        with remote.get_remote(nn_instance) as r:
+        with utils.get_remote(nn_instance) as r:
             r.execute_command("sudo -u hdfs hdfs dfs -mkdir -p /user/$USER/")
             r.execute_command("sudo -u hdfs hdfs dfs -chown $USER "
                               "/user/$USER/")
@@ -229,16 +224,16 @@ class SparkProvider(p.ProvisioningPluginBase):
         if len(dn_instances) == 0:
             return
 
-        cpo.add_provisioning_step(
+        utils.add_provisioning_step(
             dn_instances[0].cluster_id,
             utils.start_process_event_message("DataNodes"), len(dn_instances))
 
-        with context.ThreadGroup() as tg:
+        with context.PluginsThreadGroup() as tg:
             for i in dn_instances:
                 tg.spawn('spark-start-dn-%s' % i.instance_name,
                          self._start_datanode, i)
 
-    @cpo.event_wrapper(mark_successful_on_exit=True)
+    @utils.event_wrapper(mark_successful_on_exit=True)
     def _start_datanode(self, instance):
         with instance.remote() as r:
             run.start_processes(r, "datanode")
@@ -253,9 +248,9 @@ class SparkProvider(p.ProvisioningPluginBase):
 
     def _push_configs_to_nodes(self, cluster, extra, new_instances):
         all_instances = utils.get_instances(cluster)
-        cpo.add_provisioning_step(
+        utils.add_provisioning_step(
             cluster.id, _("Push configs to nodes"), len(all_instances))
-        with context.ThreadGroup() as tg:
+        with context.PluginsThreadGroup() as tg:
             for instance in all_instances:
                 extra = self._add_instance_ng_related_to_extra(
                     cluster, instance, extra)
@@ -268,7 +263,7 @@ class SparkProvider(p.ProvisioningPluginBase):
                              self._push_configs_to_existing_node, cluster,
                              extra, instance)
 
-    @cpo.event_wrapper(mark_successful_on_exit=True)
+    @utils.event_wrapper(mark_successful_on_exit=True)
     def _push_configs_to_new_node(self, cluster, extra, instance):
         files_hadoop = {
             os.path.join(c_helper.HADOOP_CONF_DIR,
@@ -308,7 +303,7 @@ class SparkProvider(p.ProvisioningPluginBase):
                         'sudo chmod 755 %(nn_path)s %(dn_path)s' %
                         {"nn_path": nn_path, "dn_path": dn_path})
 
-        with remote.get_remote(instance) as r:
+        with utils.get_remote(instance) as r:
             r.execute_command(
                 'sudo chown -R $USER:$USER /etc/hadoop'
             )
@@ -331,8 +326,9 @@ class SparkProvider(p.ProvisioningPluginBase):
             if c_helper.is_data_locality_enabled(cluster):
                 r.write_file_to(
                     '/etc/hadoop/topology.sh',
-                    f.get_file_text(
-                        'plugins/spark/resources/topology.sh'))
+                    utils.get_file_text(
+                        'plugins/spark/resources/topology.sh',
+                        'sahara_plugin_spark'))
                 r.execute_command(
                     'sudo chmod +x /etc/hadoop/topology.sh'
                 )
@@ -341,7 +337,7 @@ class SparkProvider(p.ProvisioningPluginBase):
             self._push_master_configs(r, cluster, extra, instance)
             self._push_cleanup_job(r, cluster, extra, instance)
 
-    @cpo.event_wrapper(mark_successful_on_exit=True)
+    @utils.event_wrapper(mark_successful_on_exit=True)
     def _push_configs_to_existing_node(self, cluster, extra, instance):
         node_processes = instance.node_group.node_processes
         need_update_hadoop = (c_helper.is_data_locality_enabled(cluster) or
@@ -359,11 +355,11 @@ class SparkProvider(p.ProvisioningPluginBase):
                     sp_home,
                     'conf/spark-defaults.conf'): extra['sp_defaults']
             }
-            r = remote.get_remote(instance)
+            r = utils.get_remote(instance)
             r.write_files_to(files)
             self._push_cleanup_job(r, cluster, extra, instance)
         if need_update_hadoop:
-            with remote.get_remote(instance) as r:
+            with utils.get_remote(instance) as r:
                 self._write_topology_data(r, cluster, extra)
                 self._push_master_configs(r, cluster, extra, instance)
 
@@ -451,13 +447,13 @@ class SparkProvider(p.ProvisioningPluginBase):
 
     def scale_cluster(self, cluster, instances):
         master = utils.get_instance(cluster, "master")
-        r_master = remote.get_remote(master)
+        r_master = utils.get_remote(master)
 
         run.stop_spark(r_master, self._spark_home(cluster))
 
         self._setup_instances(cluster, instances)
         nn = utils.get_instance(cluster, "namenode")
-        run.refresh_nodes(remote.get_remote(nn), "dfsadmin")
+        run.refresh_nodes(utils.get_remote(nn), "dfsadmin")
         dn_instances = [instance for instance in instances if
                         'datanode' in instance.node_group.node_processes]
         self._start_datanode_processes(dn_instances)
@@ -473,7 +469,7 @@ class SparkProvider(p.ProvisioningPluginBase):
         scalable_processes = self._get_scalable_processes()
 
         for ng_id in additional:
-            ng = ug.get_by_id(cluster.node_groups, ng_id)
+            ng = utils.get_by_id(cluster.node_groups, ng_id)
             if not set(ng.node_processes).issubset(scalable_processes):
                 raise ex.NodeGroupCannotBeScaled(
                     ng.name, _("Spark plugin cannot scale nodegroup"

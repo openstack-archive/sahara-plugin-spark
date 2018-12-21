@@ -17,17 +17,14 @@ import os
 
 import six
 
-from sahara import context
-from sahara.i18n import _
-from sahara.plugins.spark import config_helper as c_helper
-from sahara.plugins.spark import run_scripts as run
+from sahara.plugins import context
 from sahara.plugins import utils
-from sahara.utils import cluster_progress_ops as cpo
-from sahara.utils import poll_utils
-from sahara.utils import remote
+from sahara_plugin_spark.i18n import _
+from sahara_plugin_spark.plugins.spark import config_helper as c_helper
+from sahara_plugin_spark.plugins.spark import run_scripts as run
 
 
-@cpo.event_wrapper(True, step=_("Decommission %s") % "Slaves")
+@utils.event_wrapper(True, step=_("Decommission %s") % "Slaves")
 def decommission_sl(master, inst_to_be_deleted, survived_inst):
     if survived_inst is not None:
         slavenames = []
@@ -39,7 +36,7 @@ def decommission_sl(master, inst_to_be_deleted, survived_inst):
 
     cluster = master.cluster
     sp_home = utils.get_config_value_or_default("Spark", "Spark home", cluster)
-    r_master = remote.get_remote(master)
+    r_master = utils.get_remote(master)
     run.stop_spark(r_master, sp_home)
 
     # write new slave file to master
@@ -48,7 +45,7 @@ def decommission_sl(master, inst_to_be_deleted, survived_inst):
 
     # write new slaves file to each survived slave as well
     for i in survived_inst:
-        with remote.get_remote(i) as r:
+        with utils.get_remote(i) as r:
             r.write_files_to(files)
 
     run.start_spark_master(r_master, sp_home)
@@ -65,16 +62,16 @@ def _is_decommissioned(r, inst_to_be_deleted):
     return True
 
 
-@cpo.event_wrapper(True, step=_("Decommission %s") % "DataNodes")
+@utils.event_wrapper(True, step=_("Decommission %s") % "DataNodes")
 def decommission_dn(nn, inst_to_be_deleted, survived_inst):
-    with remote.get_remote(nn) as r:
+    with utils.get_remote(nn) as r:
         r.write_file_to('/etc/hadoop/dn.excl',
                         utils.generate_fqdn_host_names(
                             inst_to_be_deleted))
-        run.refresh_nodes(remote.get_remote(nn), "dfsadmin")
+        run.refresh_nodes(utils.get_remote(nn), "dfsadmin")
         context.sleep(3)
 
-        poll_utils.plugin_option_poll(
+        utils.plugin_option_poll(
             nn.cluster, _is_decommissioned, c_helper.DECOMMISSIONING_TIMEOUT,
             _("Decommission %s") % "DataNodes", 3, {
                 'r': r, 'inst_to_be_deleted': inst_to_be_deleted})

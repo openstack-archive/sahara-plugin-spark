@@ -18,10 +18,10 @@ import xml.dom.minidom as xml
 
 import mock
 
-from sahara.plugins.spark import config_helper as c_helper
-from sahara.swift import swift_helper as swift
-from sahara.tests.unit import base as test_base
-from sahara.utils import xmlutils
+from sahara.plugins import swift_helper as swift
+from sahara.plugins import utils
+from sahara_plugin_spark.plugins.spark import config_helper as c_helper
+from sahara_plugin_spark.tests.unit import base as test_base
 
 
 class ConfigHelperUtilsTest(test_base.SaharaTestCase):
@@ -62,7 +62,7 @@ class ConfigHelperUtilsTest(test_base.SaharaTestCase):
         self.assertNotIn(configs, 'script')
         self.assertNotIn(configs, 'cron')
 
-    @mock.patch("sahara.swift.utils.retrieve_auth_url")
+    @mock.patch("sahara.plugins.swift_utils.retrieve_auth_url")
     def test_generate_xml_configs(self, auth_url):
         auth_url.return_value = "http://localhost:5000/v2/"
 
@@ -73,7 +73,7 @@ class ConfigHelperUtilsTest(test_base.SaharaTestCase):
         c = c_helper.generate_xml_configs({}, ['/mnt/one'], 'localhost', None)
         doc = xml.parseString(c['core-site'])
         configuration = doc.getElementsByTagName('configuration')
-        properties = xmlutils.get_property_dict(configuration[0])
+        properties = utils.get_property_dict(configuration[0])
         self.assertDictContainsSubset(swift_vals, properties)
 
         # Make sure that user values have precedence over defaults
@@ -82,7 +82,7 @@ class ConfigHelperUtilsTest(test_base.SaharaTestCase):
             ['/mnt/one'], 'localhost', None)
         doc = xml.parseString(c['core-site'])
         configuration = doc.getElementsByTagName('configuration')
-        properties = xmlutils.get_property_dict(configuration[0])
+        properties = utils.get_property_dict(configuration[0])
         mod_swift_vals = copy.copy(swift_vals)
         mod_swift_vals['fs.swift.service.sahara.tenant'] = 'fred'
         self.assertDictContainsSubset(mod_swift_vals, properties)
@@ -94,6 +94,6 @@ class ConfigHelperUtilsTest(test_base.SaharaTestCase):
             ['/mnt/one'], 'localhost', None)
         doc = xml.parseString(c['core-site'])
         configuration = doc.getElementsByTagName('configuration')
-        properties = xmlutils.get_property_dict(configuration[0])
+        properties = utils.get_property_dict(configuration[0])
         for key in mod_swift_vals.keys():
             self.assertNotIn(key, properties)

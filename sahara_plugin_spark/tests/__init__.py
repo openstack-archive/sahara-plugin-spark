@@ -1,4 +1,4 @@
-# Copyright (c) 2015 OpenStack Foundation
+# Copyright (c) 2014 Mirantis Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,16 +13,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sahara.plugins import utils as plugin_utils
-from sahara.service.edp.spark import engine as shell_engine
+from sahara_plugin_spark.utils import patches
+patches.patch_all()
 
+import oslo_i18n
 
-class ShellEngine(shell_engine.SparkShellJobEngine):
-    def __init__(self, cluster):
-        super(ShellEngine, self).__init__(cluster)
-        self.master = plugin_utils.get_instance(cluster, "master")
-
-    @staticmethod
-    def job_type_supported(job_type):
-        return (job_type in shell_engine.SparkShellJobEngine.
-                get_supported_job_types())
+# NOTE(slukjanov): i18n.enable_lazy() must be called before
+#                  sahara.utils.i18n._() is called to ensure it has the desired
+#                  lazy lookup behavior.
+oslo_i18n.enable_lazy()

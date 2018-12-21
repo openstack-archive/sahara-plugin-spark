@@ -1,4 +1,4 @@
-# Copyright (c) 2014 Mirantis Inc.
+# Copyright (c) 2015 OpenStack Foundation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,16 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from sahara.utils import patches
-patches.patch_all()
+from sahara.plugins import edp
+from sahara.plugins import utils as plugin_utils
 
-import oslo_i18n
 
-# NOTE(slukjanov): i18n.enable_lazy() must be called before
-#                  sahara.utils.i18n._() is called to ensure it has the desired
-#                  lazy lookup behavior.
-oslo_i18n.enable_lazy()
+class ShellEngine(edp.PluginsSparkShellJobEngine):
+    def __init__(self, cluster):
+        super(ShellEngine, self).__init__(cluster)
+        self.master = plugin_utils.get_instance(cluster, "master")
+
+    @staticmethod
+    def job_type_supported(job_type):
+        return (job_type in edp.PluginsSparkShellJobEngine.
+                get_supported_job_types())

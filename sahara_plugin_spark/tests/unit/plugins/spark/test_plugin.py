@@ -16,18 +16,14 @@
 import mock
 import testtools
 
-from sahara import conductor as cond
-from sahara import context
 from sahara.plugins import base as pb
+from sahara.plugins import conductor
+from sahara.plugins import context
+from sahara.plugins import edp
 from sahara.plugins import exceptions as pe
-from sahara.plugins.spark import plugin as pl
-from sahara.service.edp.spark import engine
-from sahara.tests.unit import base
-from sahara.tests.unit import testutils as tu
-from sahara.utils import edp
-
-
-conductor = cond.API
+from sahara.plugins import testutils as tu
+from sahara_plugin_spark.plugins.spark import plugin as pl
+from sahara_plugin_spark.tests.unit import base
 
 
 class SparkPluginTest(base.SaharaWithDbTestCase):
@@ -46,35 +42,35 @@ class SparkPluginTest(base.SaharaWithDbTestCase):
 
     def test_plugin11_edp_engine(self):
         self._test_engine('1.6.0', edp.JOB_TYPE_SPARK,
-                          engine.SparkJobEngine)
+                          edp.PluginsSparkJobEngine)
 
     def test_plugin12_shell_engine(self):
         self._test_engine('1.6.0', edp.JOB_TYPE_SHELL,
-                          engine.SparkShellJobEngine)
+                          edp.PluginsSparkShellJobEngine)
 
     def test_plugin21_edp_engine(self):
         self._test_engine('2.1.0', edp.JOB_TYPE_SPARK,
-                          engine.SparkJobEngine)
+                          edp.PluginsSparkJobEngine)
 
     def test_plugin21_shell_engine(self):
         self._test_engine('2.1.0', edp.JOB_TYPE_SHELL,
-                          engine.SparkShellJobEngine)
+                          edp.PluginsSparkShellJobEngine)
 
     def test_plugin22_edp_engine(self):
         self._test_engine('2.2', edp.JOB_TYPE_SPARK,
-                          engine.SparkJobEngine)
+                          edp.PluginsSparkJobEngine)
 
     def test_plugin22_shell_engine(self):
         self._test_engine('2.2', edp.JOB_TYPE_SHELL,
-                          engine.SparkShellJobEngine)
+                          edp.PluginsSparkShellJobEngine)
 
     def test_plugin23_edp_engine(self):
         self._test_engine('2.3', edp.JOB_TYPE_SPARK,
-                          engine.SparkJobEngine)
+                          edp.PluginsSparkJobEngine)
 
     def test_plugin23_shell_engine(self):
         self._test_engine('2.3', edp.JOB_TYPE_SHELL,
-                          engine.SparkShellJobEngine)
+                          edp.PluginsSparkShellJobEngine)
 
     def _test_engine(self, version, job_type, eng):
         cluster_dict = self._init_cluster_dict(version)

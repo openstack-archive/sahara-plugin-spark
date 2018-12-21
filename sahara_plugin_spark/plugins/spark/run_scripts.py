@@ -17,11 +17,9 @@ import os
 
 from oslo_log import log as logging
 
-from sahara.i18n import _
-from sahara.plugins.spark import config_helper as c_helper
 from sahara.plugins import utils
-from sahara.utils import cluster_progress_ops
-from sahara.utils import poll_utils
+from sahara_plugin_spark.i18n import _
+from sahara_plugin_spark.plugins.spark import config_helper as c_helper
 
 
 LOG = logging.getLogger(__name__)
@@ -63,7 +61,7 @@ def stop_spark(nn_remote, sp_home):
                                                      "sbin/stop-all.sh"))
 
 
-@cluster_progress_ops.event_wrapper(
+@utils.event_wrapper(
     True, step=_("Await DataNodes start up"), param=("cluster", 0))
 def await_datanodes(cluster):
     datanodes_count = len(utils.get_instances(cluster, "datanode"))
@@ -72,7 +70,7 @@ def await_datanodes(cluster):
 
     log_msg = _("Waiting on %d DataNodes to start up") % datanodes_count
     with utils.get_instance(cluster, "namenode").remote() as r:
-        poll_utils.plugin_option_poll(
+        utils.plugin_option_poll(
             cluster, _check_datanodes_count,
             c_helper.DATANODES_STARTUP_TIMEOUT,
             log_msg, 1, {"remote": r, "count": datanodes_count})

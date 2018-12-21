@@ -18,13 +18,13 @@ import os
 
 import six
 
-from sahara import exceptions as ex
-from sahara.i18n import _
+from sahara.plugins import edp
+from sahara.plugins import exceptions as ex
 from sahara.plugins import utils as plugin_utils
-from sahara.service.edp.spark import engine as edp_engine
+from sahara_plugin_spark.i18n import _
 
 
-class EdpEngine(edp_engine.SparkJobEngine):
+class EdpEngine(edp.PluginsSparkJobEngine):
 
     edp_base_version = "1.6.0"
 
@@ -51,11 +51,11 @@ class EdpEngine(edp_engine.SparkJobEngine):
 
     @staticmethod
     def job_type_supported(job_type):
-        return job_type in edp_engine.SparkJobEngine.get_supported_job_types()
+        return job_type in edp.PluginsSparkJobEngine.get_supported_job_types()
 
     def validate_job_execution(self, cluster, job, data):
         if not self.edp_supported(cluster.hadoop_version):
-            raise ex.InvalidDataException(
+            raise ex.PluginInvalidDataException(
                 _('Spark {base} or higher required to run {type} jobs').format(
                     base=EdpEngine.edp_base_version, type=job.type))
 

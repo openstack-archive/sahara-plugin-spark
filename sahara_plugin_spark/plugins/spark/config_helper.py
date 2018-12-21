@@ -17,25 +17,20 @@ from oslo_config import cfg
 from oslo_log import log as logging
 import six
 
-from sahara import conductor as c
 from sahara.plugins import provisioning as p
+from sahara.plugins import swift_helper as swift
+from sahara.plugins import topology_helper as topology
 from sahara.plugins import utils
-from sahara.swift import swift_helper as swift
-from sahara.topology import topology_helper as topology
-from sahara.utils import files as f
-from sahara.utils import types
-from sahara.utils import xmlutils as x
 
 
-conductor = c.API
 LOG = logging.getLogger(__name__)
 CONF = cfg.CONF
 
-CORE_DEFAULT = x.load_hadoop_xml_defaults(
-    'plugins/spark/resources/core-default.xml')
+CORE_DEFAULT = utils.load_hadoop_xml_defaults(
+    'plugins/spark/resources/core-default.xml', 'sahara_plugin_spark')
 
-HDFS_DEFAULT = x.load_hadoop_xml_defaults(
-    'plugins/spark/resources/hdfs-default.xml')
+HDFS_DEFAULT = utils.load_hadoop_xml_defaults(
+    'plugins/spark/resources/hdfs-default.xml', 'sahara_plugin_spark')
 
 SWIFT_DEFAULTS = swift.read_default_swift_configs()
 
@@ -200,7 +195,7 @@ def _initialise_configs():
                     if cfg.default_value in ["true", "false"]:
                         cfg.config_type = "bool"
                         cfg.default_value = (cfg.default_value == 'true')
-                    elif types.is_int(cfg.default_value):
+                    elif utils.is_int(cfg.default_value):
                         cfg.config_type = "int"
                         cfg.default_value = int(cfg.default_value)
                     if config['name'] in CLUSTER_WIDE_CONFS:
@@ -296,8 +291,8 @@ def generate_xml_configs(configs, storage_path, nn_hostname, hadoop_port):
         core_all += topology.vm_awareness_core_config()
 
     xml_configs = {
-        'core-site': x.create_hadoop_xml(cfg, core_all),
-        'hdfs-site': x.create_hadoop_xml(cfg, HDFS_DEFAULT)
+        'core-site': utils.create_hadoop_xml(cfg, core_all),
+        'hdfs-site': utils.create_hadoop_xml(cfg, HDFS_DEFAULT)
     }
 
     return xml_configs
@@ -458,10 +453,12 @@ def generate_job_cleanup_config(cluster):
                           (args['minimum_cleanup_megabytes'] > 0
                            and args['minimum_cleanup_seconds'] > 0))}
     if job_conf['valid']:
-        job_conf['cron'] = f.get_file_text(
-            'plugins/spark/resources/spark-cleanup.cron'),
-        job_cleanup_script = f.get_file_text(
-            'plugins/spark/resources/tmp-cleanup.sh.template')
+        job_conf['cron'] = utils.get_file_text(
+            'plugins/spark/resources/spark-cleanup.cron',
+            'sahara_plugin_spark'),
+        job_cleanup_script = utils.get_file_text(
+            'plugins/spark/resources/tmp-cleanup.sh.template',
+            'sahara_plugin_spark')
         job_conf['script'] = job_cleanup_script.format(**args)
     return job_conf
 
