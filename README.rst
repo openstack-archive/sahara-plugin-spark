@@ -7,26 +7,29 @@ Team and repository tags
 
 .. Change things from this point on
 
-OpenStack Data Processing ("Sahara") project
-============================================
+OpenStack Data Processing ("Sahara") Spark Plugin
+==================================================
+
+OpenStack Sahara Spark Plugin provides the users the option to
+start Spark clusters on OpenStack Sahara.
+Check out OpenStack Sahara documentation to see how to deploy the
+Spark Plugin.
 
 Sahara at wiki.openstack.org: https://wiki.openstack.org/wiki/Sahara
 
-Storyboard project: https://storyboard.openstack.org/#!/project/935
+Storyboard project: https://storyboard.openstack.org/#!/project/openstack/sahara-plugin-spark
 
 Sahara docs site: https://docs.openstack.org/sahara/latest/
-
-Roadmap: https://wiki.openstack.org/wiki/Sahara/Roadmap
 
 Quickstart guide: https://docs.openstack.org/sahara/latest/user/quickstart.html
 
 How to participate: https://docs.openstack.org/sahara/latest/contributor/how-to-participate.html
 
-Source: https://git.openstack.org/cgit/openstack/sahara
+Source: https://git.openstack.org/cgit/openstack/sahara-plugin-spark
 
-Bugs and feature requests: https://storyboard.openstack.org/#!/project/935
+Bugs and feature requests: https://storyboard.openstack.org/#!/project/openstack/sahara-plugin-spark
 
-Release notes: https://docs.openstack.org/releasenotes/sahara/
+Release notes: https://docs.openstack.org/releasenotes/sahara-plugin-spark/
 
 License
 -------

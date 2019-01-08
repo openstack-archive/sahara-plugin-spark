@@ -37,13 +37,14 @@ For cluster provisioning, prepared images should be used.
      - based on CDH 5.11
 
 For more information about building image, refer to
-:doc:`building-guest-images`.
+:sahara-doc:`Sahara documentation <user/building-guest-images.html>`.
 
 The Spark plugin requires an image to be tagged in the sahara image registry
 with two tags: 'spark' and '<Spark version>' (e.g. '1.6.0').
 
 The image requires a username. For more information, refer to the
-:doc:`registering-image` section.
+:sahara-doc:`registering image <user/registering-image.html>` section
+of the Sahara documentation.
 
 Note that the Spark cluster is deployed using the scripts available in the
 Spark distribution, which allow the user to start all services (master and
