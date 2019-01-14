@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 #
-# sahara-spark-plugin documentation build configuration file.
+# sahara-plugin-spark documentation build configuration file.
 #
 # -- General configuration -----------------------------------------------------
 
@@ -180,7 +180,7 @@ latex_elements = {
 # Grouping the document tree into LaTeX files. List of tuples
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
-  ('index', 'sahara-spark-plugin.tex', u'sahara-spark-plugin Documentation',
+  ('index', 'sahara-plugin-spark.tex', u'sahara-plugin-spark Documentation',
    u'Sahara team', 'manual'),
 ]
 
@@ -210,7 +210,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'sahara-spark-plugin', u'sahara-spark-plugin Documentation',
+    ('index', 'sahara-plugin-spark', u'sahara-plugin-spark Documentation',
      [u'Sahara team'], 1)
 ]
 
@@ -224,8 +224,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-  ('index', 'sahara-spark-plugin', u'sahara-spark-plugin Documentation',
-   u'Sahara team', 'sahara-spark-plugin', 'One line description of project.',
+  ('index', 'sahara-plugin-spark', u'sahara-plugin-spark Documentation',
+   u'Sahara team', 'sahara-plugin-spark', 'One line description of project.',
    'Miscellaneous'),
 ]
 
