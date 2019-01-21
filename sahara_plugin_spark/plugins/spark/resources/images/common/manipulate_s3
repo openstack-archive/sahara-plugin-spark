@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SPARK_JARS_DIR_PATH="/opt/spark/jars"
+HADOOP_TOOLS_DIR_PATH="/opt/hadoop/share/hadoop/tools/lib"
+HADOOP_COMMON_DIR_PATH="/opt/hadoop/share/hadoop/common/lib"
+
+
+# The hadoop-aws and aws-java-sdk libraries are missing here, but we
+# cannot copy them from the Hadoop folder on-disk due to
+# version/patching issues
+curl -sS https://tarballs.openstack.org/sahara-extra/dist/common-artifacts/hadoop-aws-2.7.3.jar -o $SPARK_JARS_DIR_PATH/hadoop-aws.jar
+curl -sS http://central.maven.org/maven2/com/amazonaws/aws-java-sdk/1.7.4/aws-java-sdk-1.7.4.jar -o $SPARK_JARS_DIR_PATH/aws-java-sdk.jar

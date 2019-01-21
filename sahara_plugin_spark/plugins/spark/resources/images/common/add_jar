@@ -1,0 +1,20 @@
+#!/bin/bash
+
+hadoop="2.6.0"
+
+HDFS_LIB_DIR=${hdfs_lib_dir:-"/usr/share/hadoop/lib"}
+HADOOP_SWIFT_JAR_NAME="hadoop-openstack.jar"
+
+if [ $test_only -eq 0 ]; then
+    mkdir -p $HDFS_LIB_DIR
+    curl -sS -o $HDFS_LIB_DIR/$HADOOP_SWIFT_JAR_NAME $swift_url
+
+    if [ $? -ne 0 ]; then
+        echo -e "Could not download Swift Hadoop FS implementation.\nAborting"
+        exit 1
+    fi
+
+    chmod 0644 $HDFS_LIB_DIR/$HADOOP_SWIFT_JAR_NAME
+else
+    exit 0
+fi

@@ -25,10 +25,26 @@ For cluster provisioning, prepared images should be used.
      - Notes
 
    * - 2.3
+     - Ubuntu 16.04, CentOS 7
+     - sahara-image-pack
+     - 2.3
+     - based on CDH 5.11
+       use --plugin_version to specify the minor version: 2.3.2 (default),
+       2.3.1 or 2.3.0
+
+   * - 2.3
      - Ubuntu 16.04
      - sahara-image-create
      - 2.3.0
      - based on CDH 5.11
+
+   * - 2.2
+     - Ubuntu 16.04, CentOS 7
+     - sahara-image-pack
+     - 2.2
+     - based on CDH 5.11
+       use --plugin_version to specify the minor version: 2.2.1 (default),
+       or 2.2.0
 
    * - 2.2
      - Ubuntu 16.04

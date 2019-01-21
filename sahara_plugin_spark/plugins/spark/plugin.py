@@ -30,6 +30,7 @@ from sahara.plugins import utils
 from sahara_plugin_spark.i18n import _
 from sahara_plugin_spark.plugins.spark import config_helper as c_helper
 from sahara_plugin_spark.plugins.spark import edp_engine
+from sahara_plugin_spark.plugins.spark import images
 from sahara_plugin_spark.plugins.spark import run_scripts as run
 from sahara_plugin_spark.plugins.spark import scaling as sc
 from sahara_plugin_spark.plugins.spark import shell_engine
@@ -569,3 +570,19 @@ class SparkProvider(p.ProvisioningPluginBase):
             want_to_configure, self.get_configs(
                 cluster.hadoop_version), cluster, scaling)
         provider.apply_recommended_configs()
+
+    def get_image_arguments(self, hadoop_version):
+        if hadoop_version in ['1.6.0', '2.1.0']:
+            return NotImplemented
+        return images.get_image_arguments()
+
+    def pack_image(self, hadoop_version, remote,
+                   test_only=False, image_arguments=None):
+        images.pack_image(remote, test_only=test_only,
+                          image_arguments=image_arguments)
+
+    def validate_images(self, cluster, test_only=False, image_arguments=None):
+        if cluster.hadoop_version not in ['1.6.0', '2.1.0']:
+            images.validate_images(cluster,
+                                   test_only=test_only,
+                                   image_arguments=image_arguments)

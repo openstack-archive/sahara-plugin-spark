@@ -1,0 +1,41 @@
+#!/bin/bash
+
+tmp_dir=/tmp/spark
+CDH_VERSION=5.11
+mkdir -p $tmp_dir
+
+if [ ! -d /opt/spark ]; then
+    if [ $test_only -eq 0 ]; then
+        # The user is not providing his own Spark distribution package
+        if [ -z "${SPARK_DOWNLOAD_URL:-}" ]; then
+            # Check hadoop version
+            # INFO on hadoop versions: http://spark.apache.org/docs/latest/hadoop-third-party-distributions.html
+            # Now the below is just a sanity check
+            if [ -z "${SPARK_HADOOP_DL:-}" ]; then
+                SPARK_HADOOP_DL=hadoop2.7
+            fi
+
+            SPARK_DOWNLOAD_URL="http://archive.apache.org/dist/spark/spark-$plugin_version/spark-$plugin_version-bin-$SPARK_HADOOP_DL.tgz"
+        fi
+
+        echo "Downloading SPARK"
+        spark_file=$(basename "$SPARK_DOWNLOAD_URL")
+        wget -O $tmp_dir/$spark_file $SPARK_DOWNLOAD_URL
+        echo "$SPARK_DOWNLOAD_URL" > $tmp_dir/spark_url.txt
+
+        echo "Extracting SPARK"
+        extract_folder=$(tar tzf $tmp_dir/$spark_file | sed -e 's@/.*@@' | uniq)
+        echo "Decompressing Spark..."
+        tar xzf $tmp_dir/$spark_file
+        rm $tmp_dir/$spark_file
+
+        echo "Moving SPARK to /opt/"
+        # Placing spark in /opt/spark
+        mv $extract_folder /opt/spark/
+        mv $tmp_dir/spark_url.txt /opt/spark/
+
+        rm -Rf $tmp_dir
+    else
+        exit 1
+    fi
+fi
