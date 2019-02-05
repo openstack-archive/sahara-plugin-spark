@@ -116,6 +116,7 @@ class SparkPluginTest(base.SaharaWithDbTestCase):
 class SparkValidationTest(base.SaharaTestCase):
     def setUp(self):
         super(SparkValidationTest, self).setUp()
+        self.override_config("plugins", ["spark"])
         pb.setup_plugins()
         self.plugin = pl.SparkProvider()
 
