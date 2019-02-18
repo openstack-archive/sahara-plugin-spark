@@ -1,0 +1,12 @@
+#!/bin/bash
+
+firstboot_script_name="/opt/spark/firstboot.sh"
+sed -i -e "s,^exit 0$,[ -f $firstboot_script_name ] \&\& sh $firstboot_script_name; exit 0," /etc/rc.local
+user_and_group_names="ubuntu:ubuntu"
+
+cat >> $firstboot_script_name <<EOF
+#!/bin/sh
+chown -R $user_and_group_names /opt/spark
+chown -R $user_and_group_names /etc/hadoop
+rm $firstboot_script_name
+EOF
