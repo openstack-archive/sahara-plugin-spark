@@ -441,7 +441,7 @@ def generate_hadoop_setup_script(storage_paths, env_configs):
 
 
 def generate_job_cleanup_config(cluster):
-    args = {
+    spark_config = {
         'minimum_cleanup_megabytes': utils.get_config_value_or_default(
             "Spark", "Minimum cleanup megabytes", cluster),
         'minimum_cleanup_seconds': utils.get_config_value_or_default(
@@ -449,9 +449,15 @@ def generate_job_cleanup_config(cluster):
         'maximum_cleanup_seconds': utils.get_config_value_or_default(
             "Spark", "Maximum cleanup seconds", cluster)
     }
-    job_conf = {'valid': (args['maximum_cleanup_seconds'] > 0 and
-                          (args['minimum_cleanup_megabytes'] > 0
-                           and args['minimum_cleanup_seconds'] > 0))}
+    job_conf = {
+        'valid': (
+            _convert_config_to_int(
+                spark_config['maximum_cleanup_seconds']) > 0 and
+            _convert_config_to_int(
+                spark_config['minimum_cleanup_megabytes']) > 0 and
+            _convert_config_to_int(
+                spark_config['minimum_cleanup_seconds']) > 0)
+    }
     if job_conf['valid']:
         job_conf['cron'] = utils.get_file_text(
             'plugins/spark/resources/spark-cleanup.cron',
@@ -459,8 +465,15 @@ def generate_job_cleanup_config(cluster):
         job_cleanup_script = utils.get_file_text(
             'plugins/spark/resources/tmp-cleanup.sh.template',
             'sahara_plugin_spark')
-        job_conf['script'] = job_cleanup_script.format(**args)
+        job_conf['script'] = job_cleanup_script.format(**spark_config)
     return job_conf
+
+
+def _convert_config_to_int(config_value):
+    try:
+        return int(config_value)
+    except ValueError:
+        return -1
 
 
 def extract_name_values(configs):
