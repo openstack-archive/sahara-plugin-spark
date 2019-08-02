@@ -1,0 +1,62 @@
+# Surit Aryal <aryalsurit@gmail.com>, 2019. #zanata
+msgid ""
+msgstr ""
+"Project-Id-Version: sahara-plugin-spark VERSION\n"
+"Report-Msgid-Bugs-To: https://bugs.launchpad.net/openstack-i18n/\n"
+"POT-Creation-Date: 2019-07-23 14:26+0000\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"PO-Revision-Date: 2019-08-02 08:40+0000\n"
+"Last-Translator: Surit Aryal <aryalsurit@gmail.com>\n"
+"Language-Team: Nepali\n"
+"Language: ne\n"
+"X-Generator: Zanata 4.3.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+
+#, python-format
+msgid "%s or more"
+msgstr "%s वा अधिक"
+
+msgid "1 or more"
+msgstr "१ वा अधिक"
+
+msgid "Await DataNodes start up"
+msgstr "प्रतीक्षा डाटा Nodes शुरू"
+
+#, python-format
+msgid "Decommission %s"
+msgstr "Decommission %s"
+
+#, python-format
+msgid "Number of %(dn)s instances should not be less than %(replication)s"
+msgstr "%(dn)s घटनाहरूको संख्या %(replication)s भन्दा कम हुनुहुन्न"
+
+msgid "Push configs to nodes"
+msgstr "कन्फिगरेसन नोडहरूमा पुश गर्नुहोस्"
+
+#, python-format
+msgid "Spark plugin cannot scale nodegroup with processes: %s"
+msgstr "Spark pluginले प्रक्रियाहरूसँग नोड ग्रुप मापन गर्न सक्दैन: %s"
+
+#, python-format
+msgid ""
+"Spark plugin cannot shrink cluster because there would be not enough nodes "
+"for HDFS replicas (replication factor is %s)"
+msgstr ""
+"Spark plugin क्लस्टर कम गर्न सक्दैन किनभने त्यहाँ HDFS प्रतिकृतिहरु लागि पर्याप्त नोड्स "
+"(प्रतिकृति कारक %s हो)"
+
+msgid "Spark {base} or higher required to run {type} jobs"
+msgstr "Spark {base} or higher required to run {type} jobs"
+
+msgid ""
+"This plugin provides an ability to launch Spark on Hadoop CDH cluster "
+"without any management consoles."
+msgstr ""
+"यो प्लगइनले कुनै व्यवस्थापन कन्सोल बिना Hadoop CDH क्लस्टरमा Spark  सुरू गर्न क्षमता "
+"प्रदान गर्दछ।"
+
+#, python-format
+msgid "Waiting on %d DataNodes to start up"
+msgstr "%d DataNodes सुरू गर्न पर्खँदै"
