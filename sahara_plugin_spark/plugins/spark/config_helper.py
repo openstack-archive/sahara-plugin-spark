@@ -228,6 +228,7 @@ def _initialise_configs():
 
     return configs
 
+
 # Initialise plugin Hadoop configurations
 PLUGIN_CONFIGS = _initialise_configs()
 
@@ -423,7 +424,7 @@ def generate_hadoop_setup_script(storage_paths, env_configs):
     script_lines.append("cat /etc/hadoop/hadoop-env.sh >> /tmp/hadoop-env.sh")
     script_lines.append("cp /tmp/hadoop-env.sh /etc/hadoop/hadoop-env.sh")
 
-    hadoop_log = storage_paths[0] + "/log/hadoop/\$USER/"
+    hadoop_log = storage_paths[0] + "/log/hadoop/\\$USER/"
     script_lines.append('sed -i "s,export HADOOP_LOG_DIR=.*,'
                         'export HADOOP_LOG_DIR=%s," /etc/hadoop/hadoop-env.sh'
                         % hadoop_log)

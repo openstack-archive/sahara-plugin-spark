@@ -83,8 +83,8 @@ def _check_datanodes_count(remote, count):
     LOG.debug("Checking DataNodes count")
     ex_code, stdout = remote.execute_command(
         'sudo su -lc "hdfs dfsadmin -report" hdfs | '
-        'grep \'Live datanodes\|Datanodes available:\' | '
-        'grep -o \'[0-9]\+\' | head -n 1')
+        r'grep \'Live datanodes\|Datanodes available:\' | '
+        r'grep -o \'[0-9]\+\' | head -n 1')
     LOG.debug("DataNodes count='{count}'".format(count=stdout.strip()))
 
     return stdout and int(stdout) == count

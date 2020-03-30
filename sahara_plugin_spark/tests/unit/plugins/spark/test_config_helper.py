@@ -33,7 +33,7 @@ class ConfigHelperUtilsTest(test_base.SaharaTestCase):
 
     @mock.patch('sahara.plugins.utils.get_config_value_or_default')
     def test_cleanup_configs(self, get_config_value):
-        getter = lambda plugin, key, cluster: plugin_configs[key]
+        getter = lambda plugin, key, cluster: plugin_configs[key]  # noqa: E731
         get_config_value.side_effect = getter
         plugin_configs = {"Minimum cleanup megabytes": 4096,
                           "Minimum cleanup seconds": 86400,
