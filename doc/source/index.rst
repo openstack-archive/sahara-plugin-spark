@@ -5,3 +5,4 @@ Spark plugin for Sahara
    :maxdepth: 2
 
    user/index
+   contributor/index
