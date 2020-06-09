@@ -16,7 +16,7 @@
 import copy
 import xml.dom.minidom as xml
 
-import mock
+from unittest import mock
 
 from sahara.plugins import swift_helper as swift
 from sahara.plugins import utils
