@@ -15,8 +15,6 @@
 
 import os
 
-import six
-
 from sahara.plugins import context
 from sahara.plugins import utils
 from sahara_plugin_spark.i18n import _
@@ -94,7 +92,7 @@ def parse_dfs_report(cmd_output):
 
     res = []
     datanode_info = {}
-    for i in six.moves.xrange(0, len(array)):
+    for i in range(0, len(array)):
         if array[i]:
             idx = str.find(array[i], ':')
             name = array[i][0:idx]

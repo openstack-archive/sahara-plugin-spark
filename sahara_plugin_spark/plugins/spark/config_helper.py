@@ -15,7 +15,6 @@
 
 from oslo_config import cfg
 from oslo_log import log as logging
-import six
 
 from sahara.plugins import provisioning as p
 from sahara.plugins import swift_helper as swift
@@ -184,7 +183,7 @@ PRIORITY_1_CONFS += CLUSTER_WIDE_CONFS
 
 def _initialise_configs():
     configs = []
-    for service, config_lists in six.iteritems(XML_CONFS):
+    for service, config_lists in XML_CONFS.items():
         for config_list in config_lists:
             for config in config_list:
                 if config['name'] not in HIDDEN_CONFS:
@@ -204,13 +203,13 @@ def _initialise_configs():
                         cfg.priority = 1
                     configs.append(cfg)
 
-    for service, config_items in six.iteritems(ENV_CONFS):
-        for name, param_format_str in six.iteritems(config_items):
+    for service, config_items in ENV_CONFS.items():
+        for name, param_format_str in config_items.items():
             configs.append(p.Config(name, service, "node",
                                     default_value=1024, priority=1,
                                     config_type="int"))
 
-    for service, config_items in six.iteritems(SPARK_CONFS):
+    for service, config_items in SPARK_CONFS.items():
         for item in config_items['OPTIONS']:
             cfg = p.Config(name=item["name"],
                            description=item["description"],
@@ -279,7 +278,7 @@ def generate_xml_configs(configs, storage_path, nn_hostname, hadoop_port):
     if is_swift_enabled(configs):
         swft_def = SWIFT_DEFAULTS
         swift_configs = extract_name_values(swift.get_swift_configs())
-        for key, value in six.iteritems(swift_configs):
+        for key, value in swift_configs.items():
             if key not in cfg:
                 cfg[key] = value
 

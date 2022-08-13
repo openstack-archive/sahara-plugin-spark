@@ -16,8 +16,6 @@
 
 import os
 
-import six
-
 from sahara.plugins import edp
 from sahara.plugins import exceptions as ex
 from sahara.plugins import utils as plugin_utils
@@ -37,7 +35,7 @@ class EdpEngine(edp.PluginsSparkJobEngine):
             get_config_value_or_default("Spark", "Spark home", self.cluster),
             "bin/spark-submit")
         self.plugin_params["deploy-mode"] = "client"
-        port_str = six.text_type(
+        port_str = str(
             plugin_utils.get_config_value_or_default(
                 "Spark", "Master port", self.cluster))
         self.plugin_params["master"] = ('spark://%(host)s:' + port_str)
